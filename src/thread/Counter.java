@@ -8,6 +8,24 @@ public class Counter {
 	private AtomicInteger atomicI = new AtomicInteger(0);
 	private int i = 0;
 
+	/** * 使用CAS实现线程安全计数器 */
+	private void safeCount() {
+		for (;;) {
+			int i = atomicI.get();
+			boolean suc = atomicI.compareAndSet(i, ++i);
+			if (suc) {
+				break;
+			}
+		}
+	}
+
+	/**
+	 * 非线程安全计数器
+	 */
+	private void count() {
+		i++;
+	}
+	
 	public static void main(String[] args) {
 		final Counter cas = new Counter();
 		List<Thread> ts = new ArrayList<Thread>(600);
@@ -40,21 +58,4 @@ public class Counter {
 		System.out.println(System.currentTimeMillis() - start);
 	}
 
-	/** * 使用CAS实现线程安全计数器 */
-	private void safeCount() {
-		for (;;) {
-			int i = atomicI.get();
-			boolean suc = atomicI.compareAndSet(i, ++i);
-			if (suc) {
-				break;
-			}
-		}
-	}
-
-	/**
-	 * 非线程安全计数器
-	 */
-	private void count() {
-		i++;
-	}
 }
